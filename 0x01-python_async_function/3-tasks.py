@@ -4,7 +4,8 @@ Module for creating asyncio Tasks from wait_random coroutine.
 """
 
 import asyncio
-from 0-basic_async_syntax import wait_random
+
+wait_random = __import__('0-basic_async_syntax').wait_random
 
 
 def task_wait_random(max_delay: int) -> asyncio.Task:
@@ -17,4 +18,5 @@ def task_wait_random(max_delay: int) -> asyncio.Task:
     Returns:
         asyncio.Task: Task object for wait_random
     """
-    return asyncio.create_task(wait_random(max_delay))
+    loop = asyncio.get_event_loop()
+    return loop.create_task(wait_random(max_delay))
