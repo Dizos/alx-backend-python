@@ -124,3 +124,17 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         Tears down the class by stopping the requests.get patcher.
         """
         cls.get_patcher.stop()
+
+    def test_public_repos(self) -> None:
+        """
+        Tests that GithubOrgClient.public_repos returns the expected list of repository names.
+        """
+        client = GithubOrgClient("test")
+        self.assertEqual(client.public_repos(), self.expected_repos)
+
+    def test_public_repos_with_license(self) -> None:
+        """
+        Tests that GithubOrgClient.public_repos with apache-2.0 license returns the expected repos.
+        """
+        client = GithubOrgClient("test")
+        self.assertEqual(client.public_repos(license="apache-2.0"), self.apache2_repos)
