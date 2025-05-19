@@ -70,3 +70,19 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(client.public_repos(), expected_repos)
             mock_get_json.assert_called_once_with(test_url)
             mock_url.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self, repo: Dict, license_key: str, expected: bool) -> None:
+        """
+        Tests that GithubOrgClient.has_license returns whether the repo has the specified license.
+
+        Args:
+            repo: The repository dictionary containing license information.
+            license_key: The license key to check.
+            expected: The expected boolean result.
+        """
+        client = GithubOrgClient("test")
+        self.assertEqual(client.has_license(repo, license_key), expected)
