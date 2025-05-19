@@ -6,7 +6,7 @@ This module contains unit tests for the client module.
 import unittest
 from unittest.mock import patch, PropertyMock
 from parameterized import parameterized
-from typing import Dict
+from typing import Dict, List
 from client import GithubOrgClient
 
 
@@ -49,5 +49,24 @@ class TestGithubOrgClient(unittest.TestCase):
         test_payload = {"repos_url": expected_url}
         with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
             mock_org.return_value = test_payload
-            client | GithubOrgClient(org_name)
+            client = GithubOrgClient(org_name)
             self.assertEqual(client._public_repos_url, expected_url)
+
+    @patch("client.get_json")
+    def test_public_repos(self, mock_get_json: unittest.mock.MagicMock) -> None:
+        """
+        Tests that GithubOrgClient.public_repos returns the expected list of repos and mocks are called once.
+
+        Args:
+            mock_get_json: The mocked get_json function.
+        """
+        test_url = "https://api.github.com/orgs/test/repos"
+        test_payload = [{"name": "repo1"}, {"name": "repo2"}]
+        expected_repos = ["repo1", "repo2"]
+        mock_get_json.return_value = test_payload
+        with patch("client.GithubOrgClient._public_repos_url", new_callable=PropertyMock) as mock_url:
+            mock_url.return_value = test_url
+            client = GithubOrgClient("test")
+            self.assertEqual(client.public_repos(), expected_repos)
+            mock_get_json.assert_called_once_with(test_url)
+            mock_url.assert_called_once()
